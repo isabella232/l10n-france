@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 #
-#   account_statement_mercanet for OpenERP
-#   Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
-#   @author Sébastien BEAU <sebastien.beau@akretion.com>
+#   account_statement_bnp_import for OpenERP
+#   Copyright (C) 2012 Akretion Benoît GUILLOT <benoit.guillot@akretion.com>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as
@@ -20,6 +19,4 @@
 #
 ###############################################################################
 
-import file_document
-import statement
-import parser
+import mercanet_parser

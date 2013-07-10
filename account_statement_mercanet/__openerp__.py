@@ -28,7 +28,7 @@
     'description': """empty""",
     'author': 'Akretion',
     'website': 'http://www.akretion.com/',
-    'depends': ['account_statement_email'], 
+    'depends': ['account_statement_email', 'account_statement_transactionid_completion'], 
     'init_xml': [],
     'update_xml': [ 
     ],
