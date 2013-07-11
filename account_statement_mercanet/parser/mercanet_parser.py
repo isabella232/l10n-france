@@ -123,5 +123,6 @@ class MercanetFileParser(FileParser):
         for row in self.result_row_list:
             val += row.get(u"OPERATION_AMOUNT",0.0)
         self.transfer_amount = - val
+        self.statement_date = self.result_row_list[0][u"PAYMENT_DATE"]
         return res
 
