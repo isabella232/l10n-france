@@ -26,7 +26,7 @@ import datetime
 from account_statement_base_import.parser.file_parser import FileParser
 from csv import Dialect
 from _csv import QUOTE_MINIMAL, register_dialect
-
+from openerp.osv import osv 
 
 def float_or_zero(val):
     """ Conversion function used to manage
@@ -57,11 +57,13 @@ class MercanetFileParser(FileParser):
 
     def __init__(self, parse_name, ftype='csv'):
         convertion_dict = {
-            u"PAYMENT_DATE": format_date,
-            u"TRANSACTION_ID": unicode,
-            u"OPERATION_NAME": unicode,
-            u"OPERATION_AMOUNT": float_or_zero,
+            "OPERATION_DATE": format_date,
+            "PAYMENT_DATE": unicode,
+            "TRANSACTION_ID": unicode,
+            "OPERATION_NAME": unicode,
+            "OPERATION_AMOUNT": float_or_zero,
         }
+        self.refund_amount = None
         super(MercanetFileParser,self).__init__(parse_name, ftype=ftype,
                                            convertion_dict=convertion_dict,
                                            dialect=mercanet_dialect)
@@ -105,12 +107,12 @@ class MercanetFileParser(FileParser):
         """
 
         res = {
-            'name': line[u"TRANSACTION_ID"],
-            'date': line[u"PAYMENT_DATE"],
-            'amount': line[u'OPERATION_AMOUNT'],
+            'name': line["TRANSACTION_ID"],
+            'date': line["OPERATION_DATE"],
+            'amount': line['OPERATION_AMOUNT'],
             'ref': '/',
-            'transaction_id': line[u"TRANSACTION_ID"],
-            'label': line[u"OPERATION_NAME"],
+            'transaction_id': line["PAYMENT_DATE"] + line["TRANSACTION_ID"],
+            'label': line["OPERATION_NAME"],
         }
         return res
 
@@ -119,10 +121,26 @@ class MercanetFileParser(FileParser):
         Compute the total transfer amount
         """
         res = super(MercanetFileParser, self)._post(*args, **kwargs)
-        val = 0.0
+        self.transfer_amount = 0.0
+        self.refund_amount = 0.0
+        rows = []
         for row in self.result_row_list:
-            val += row.get(u"OPERATION_AMOUNT",0.0)
-        self.transfer_amount = - val
-        self.statement_date = self.result_row_list[0][u"PAYMENT_DATE"]
+            if row['OPERATION_NAME'] in ('CREDIT'):
+               continue
+            rows.append(row)
+            if row['OPERATION_NAME'] == 'CREDIT_CAPTURE':
+                row["OPERATION_AMOUNT"] = - row["OPERATION_AMOUNT"]
+                self.refund_amount -= row["OPERATION_AMOUNT"]
+            elif row['OPERATION_NAME'] == 'DEBIT_CAPTURE':
+                self.transfer_amount -= row["OPERATION_AMOUNT"]
+            else:
+                raise osv.except_osv(_("User Error"),
+                    _("The bank statement imported have invalide line,"
+                    " indeed the operation type %s is not supported"
+                    )%row['OPERATION_NAME'])
+        self.result_row_list = rows
+        self.statement_date = self.result_row_list[0]["OPERATION_DATE"]
         return res
 
+    def get_refund_amount(self):
+        return self.refund_amount

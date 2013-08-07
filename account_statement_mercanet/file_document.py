@@ -80,7 +80,7 @@ class file_document(orm.Model):
                 if not sale_id and line['TRANSACTION_STATUS'] != u'REFUSED':
                     error += _("There is no order %s\n")%line['ORDER_ID']
                 sale_obj.write(cr, uid, sale_id, {
-                        'transaction_id': line['TRANSACTION_ID'],
+                        'transaction_id': line['PAYMENT_DATE'] + line['TRANSACTION_ID'],
                         },context=context)
             if error:
                 raise Exception(error)

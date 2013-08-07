@@ -20,7 +20,7 @@
 ###############################################################################
 
 from openerp.osv import orm, fields
-
+from tools.translate import _
 
 class AccountStatementProfil(orm.Model):
     _inherit = "account.statement.profile"
@@ -34,6 +34,27 @@ class AccountStatementProfil(orm.Model):
                     ])
         return res
 
+
+    def _add_special_line(self, cursor, uid, statement_id, parser, result_row_list, profile, context=None):
+        super(AccountStatementProfil, self)._add_special_line(cursor, uid, statement_id, parser, result_row_list, profile, context=context)
+      	if parser.parser_for('mercanet_csvparser') and parser.get_refund_amount():
+            partner_id = profile.partner_id and profile.partner_id.id or False
+            transfer_account_id = profile.internal_account_transfer_id.id or False
+            statement_line_obj = self.pool.get('account.bank.statement.line')
+            transfer_vals = {
+                'name': _('Transfer'),
+                'date': parser.get_statement_date(),
+                'amount': parser.get_refund_amount(),
+                'partner_id': partner_id,
+                'type': 'general',
+                'statement_id': statement_id,
+                'account_id': transfer_account_id,
+                'ref': 'transfer',
+                # !! We set the already_completed so auto-completion will not update those values !
+                'already_completed': True,
+            }
+
+            statement_line_obj.create(cursor, uid, transfer_vals, context=context)
 
 class account_bank_statement_line(orm.Model):
     _inherit = "account.bank.statement.line"
