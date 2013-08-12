@@ -56,18 +56,3 @@ class AccountStatementProfil(orm.Model):
 
             statement_line_obj.create(cursor, uid, transfer_vals, context=context)
 
-class account_bank_statement_line(orm.Model):
-    _inherit = "account.bank.statement.line"
-
-    _columns = {
-
-    }
-
-
-class AccountStatementCompletionRule(orm.Model):
-    _inherit = "account.statement.completion.rule"
-
-    def get_functions(self, cr, uid, context=None):
-        res = super(AccountStatementCompletionRule, self).get_functions(cr, uid, context=context)
-        res.extend([])
-        return res

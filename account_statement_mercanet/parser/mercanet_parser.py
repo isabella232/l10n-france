@@ -56,7 +56,7 @@ class MercanetFileParser(FileParser):
     """
 
     def __init__(self, parse_name, ftype='csv'):
-        convertion_dict = {
+        conversion_dict = {
             "OPERATION_DATE": format_date,
             "PAYMENT_DATE": unicode,
             "TRANSACTION_ID": unicode,
@@ -65,7 +65,7 @@ class MercanetFileParser(FileParser):
         }
         self.refund_amount = None
         super(MercanetFileParser,self).__init__(parse_name, ftype=ftype,
-                                           convertion_dict=convertion_dict,
+                                           conversion_dict=conversion_dict,
                                            dialect=mercanet_dialect)
 
     @classmethod
