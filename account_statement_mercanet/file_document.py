@@ -50,7 +50,7 @@ class file_document(orm.Model):
         res = super(file_document, self).\
                 _prepare_data_for_file_document(cr, uid, msg, context=context)
         if msg['from'] == EMAIL_FROM and msg['subject'] in SUBJECT_TO_PROCESS:
-            ext_id = msg['message-id'].split('@')[0][1:]
+            ext_id = msg['message_id'].split('@')[0][1:]
             file_obj = self.pool['file.document']
             if file_obj.search(cr, uid, [
                     ['ext_id', '=', ext_id],
