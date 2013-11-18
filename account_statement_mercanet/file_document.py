@@ -26,6 +26,8 @@ import unicodecsv
 from cStringIO import StringIO
 import base64
 from openerp.tools.translate import _
+import logging
+
 
 SUBJECT_TO_PROCESS = [
     u'liste des paiements trait\xe9s',
@@ -33,6 +35,8 @@ SUBJECT_TO_PROCESS = [
 ]
 
 EMAIL_FROM = u"so_send_journal_fond@sips-atos.com" 
+
+_logger = logging.getLogger(__name__)
 
 class file_document(orm.Model):
     _inherit = "file.document"
@@ -46,7 +50,14 @@ class file_document(orm.Model):
         res = super(file_document, self).\
                 _prepare_data_for_file_document(cr, uid, msg, context=context)
         if msg['from'] == EMAIL_FROM and msg['subject'] in SUBJECT_TO_PROCESS:
-            ext_id = msg['message_id'].split('@')[0][1:]
+            ext_id = msg['message-id'].split('@')[0][1:]
+            file_obj = self.pool['file.document']
+            if file_obj.search(cr, uid, [
+                    ['ext_id', '=', ext_id],
+                    ['fetchmail_server_id', '=', context.get('default_fetchmail_server_id')],
+                    ], context=context):
+                _logger.info('The file document with the id %s already exist, skip the import'%ext_id)
+            	return []
             vals = {
                 'name': msg['subject'],
                 'direction': 'input',
