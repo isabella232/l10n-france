@@ -37,7 +37,7 @@ def float_or_zero(val):
 def format_date(val):
     return datetime.datetime.strptime(val, "%Y%m%d")
 
-class mercanet_dialect(Dialect):
+class atos_dialect(Dialect):
     """Describe the usual properties of Excel-generated CSV files."""
     delimiter = '\t'
     quotechar = '"'
@@ -45,10 +45,10 @@ class mercanet_dialect(Dialect):
     skipinitialspace = False
     lineterminator = '\n'
     quoting = QUOTE_MINIMAL
-register_dialect("mercanet_dialect", mercanet_dialect)
+register_dialect("atos_dialect", atos_dialect)
 
 
-class MercanetFileParser(FileParser):
+class AtosFileParser(FileParser):
     """
     Standard parser that use a define format in csv or xls to import into a
     bank statement. This is mostely an example of how to proceed to create a new
@@ -64,9 +64,9 @@ class MercanetFileParser(FileParser):
             "OPERATION_AMOUNT": float_or_zero,
         }
         self.refund_amount = None
-        super(MercanetFileParser,self).__init__(parse_name, ftype=ftype,
+        super(AtosFileParser,self).__init__(parse_name, ftype=ftype,
                                            conversion_dict=conversion_dict,
-                                           dialect=mercanet_dialect)
+                                           dialect=atos_dialect)
 
     @classmethod
     def parser_for(cls, parser_name):
@@ -74,7 +74,7 @@ class MercanetFileParser(FileParser):
         Used by the new_bank_statement_parser class factory. Return true if
         the providen name is generic_csvxls_so
         """
-        return parser_name == 'mercanet_csvparser'
+        return parser_name == 'atos_csvparser'
 
     def _pre(self, *args, **kwargs):
         split_file = self.filebuffer.split("\n")
@@ -120,7 +120,7 @@ class MercanetFileParser(FileParser):
         """
         Compute the total transfer amount
         """
-        res = super(MercanetFileParser, self)._post(*args, **kwargs)
+        res = super(AtosFileParser, self)._post(*args, **kwargs)
         self.transfer_amount = 0.0
         self.refund_amount = 0.0
         rows = []

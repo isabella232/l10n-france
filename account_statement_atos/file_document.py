@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 #
-#   account_statement_mercanet for OpenERP
+#   account_statement_atos for OpenERP
 #   Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
 #   @author Sébastien BEAU <sebastien.beau@akretion.com>
 #
@@ -43,7 +43,7 @@ class file_document(orm.Model):
 
     def get_file_document_type(self, cr, uid, context=None):
         res = super(file_document, self).get_file_document_type(cr, uid, context=context)
-        res.append(('mercanet_transaction', 'Mercanet Transaction'))
+        res.append(('atos_transaction', 'Atos Transaction'))
         return res
 
     def _prepare_data_for_file_document(self, cr, uid, msg, context=None):
@@ -68,7 +68,7 @@ class file_document(orm.Model):
             }
             if msg['subject'] == u'liste des paiements trait\xe9s':
                 vals.update({
-                    'file_type': 'mercanet_transaction',
+                    'file_type': 'atos_transaction',
                     'sequence': 50,
                 })
             res.append(vals)
@@ -76,7 +76,7 @@ class file_document(orm.Model):
 
     def _run(self, cr, uid, filedocument, context=None):
         super(file_document, self)._run(cr, uid, filedocument, context=context) 
-        if filedocument.file_type == 'mercanet_transaction':
+        if filedocument.file_type == 'atos_transaction':
             sale_obj = self.pool['sale.order']
             lines = base64.b64decode(filedocument.datas).split('\r\n')
             lines = [line.strip() for line in lines[1:]]

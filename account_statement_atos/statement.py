@@ -30,14 +30,14 @@ class AccountStatementProfil(orm.Model):
         Has to be inherited to add parser
         """
         res = super(AccountStatementProfil, self).get_import_type_selection(cr, uid, context=context)
-        res.extend([('mercanet_csvparser', 'Parser for Mercanet import statement'),
+        res.extend([('atos_csvparser', 'Parser for Atos import statement'),
                     ])
         return res
 
 
     def _add_special_line(self, cursor, uid, statement_id, parser, result_row_list, profile, context=None):
         super(AccountStatementProfil, self)._add_special_line(cursor, uid, statement_id, parser, result_row_list, profile, context=context)
-      	if parser.parser_for('mercanet_csvparser') and parser.get_refund_amount():
+      	if parser.parser_for('atos_csvparser') and parser.get_refund_amount():
             partner_id = profile.partner_id and profile.partner_id.id or False
             transfer_account_id = profile.internal_account_transfer_id.id or False
             statement_line_obj = self.pool.get('account.bank.statement.line')

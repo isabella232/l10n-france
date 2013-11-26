@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 #
-#   account_statement_mercanet for OpenERP
-#   Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
-#   @author Sébastien BEAU <sebastien.beau@akretion.com>
+#   account_statement_bnp_import for OpenERP
+#   Copyright (C) 2012 Akretion Benoît GUILLOT <benoit.guillot@akretion.com>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as
@@ -20,22 +19,4 @@
 #
 ###############################################################################
 
-{
-    'name': 'account_statement_mercanet',
-    'version': '0.1',
-    'category': 'Generic Modules/Others',
-    'license': 'AGPL-3',
-    'description': """empty""",
-    'author': 'Akretion',
-    'website': 'http://www.akretion.com/',
-    'depends': [
-        'account_statement_email',
-        'account_statement_transactionid_completion',
-        'sale'
-    ], 
-    'init_xml': [],
-    'update_xml': [ 
-    ],
-    'demo_xml': [],
-    'installable': True,
-}
+import atos_parser

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 #
-#   account_statement_mercanet for OpenERP
+#   account_statement_atos for OpenERP
 #   Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
 #   @author Sébastien BEAU <sebastien.beau@akretion.com>
 #
