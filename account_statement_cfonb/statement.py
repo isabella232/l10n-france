@@ -35,10 +35,10 @@ class AccountStatementProfil(orm.Model):
 
     def multi_statement_import(self, cr, uid, ids, profile_id, file_stream, ftype="csv", context=None):
         result = super(AccountStatementProfil, self).multi_statement_import(cr, uid,\
-                ids, profile_id, file_stream, ftype="csv", context=context)
+                ids, profile_id, file_stream, ftype=ftype, context=context)
         while context.get('statement_to_process'):
             result += super(AccountStatementProfil, self).multi_statement_import(cr, uid, ids,\
-                    profile_id, file_stream, ftype="csv", context=context)
+                    profile_id, file_stream, ftype=ftype, context=context)
         return result
 
 class account_bank_statement_line(orm.Model):
