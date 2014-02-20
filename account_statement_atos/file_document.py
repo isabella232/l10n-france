@@ -49,6 +49,7 @@ class file_document(orm.Model):
     def _prepare_data_for_file_document(self, cr, uid, msg, context=None):
         res = super(file_document, self).\
                 _prepare_data_for_file_document(cr, uid, msg, context=context)
+        print "azaz", res
         if msg['from'] == EMAIL_FROM and msg['subject'] in SUBJECT_TO_PROCESS:
             ext_id = msg['message_id'].split('@')[0][1:]
             file_obj = self.pool['file.document']
