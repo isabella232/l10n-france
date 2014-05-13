@@ -36,6 +36,9 @@
     'init_xml': [],
     'update_xml': [ 
     ],
+    'external_dependencies': {
+        'python': ['unicodecsv'],
+    },
     'demo_xml': [],
     'installable': True,
 }
