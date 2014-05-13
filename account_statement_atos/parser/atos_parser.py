@@ -58,10 +58,11 @@ class AtosFileParser(FileParser):
     def __init__(self, parse_name, ftype='csv'):
         conversion_dict = {
             "OPERATION_DATE": format_date,
-            "PAYMENT_DATE": unicode,
+            "PAYMENT_DATE": format_date,
             "TRANSACTION_ID": unicode,
             "OPERATION_NAME": unicode,
             "OPERATION_AMOUNT": float_or_zero,
+            "OPERATION_SEQUENCE": unicode,
         }
         self.refund_amount = None
         super(AtosFileParser,self).__init__(parse_name, ftype=ftype,
@@ -111,8 +112,10 @@ class AtosFileParser(FileParser):
             'date': line["OPERATION_DATE"],
             'amount': line['OPERATION_AMOUNT'],
             'ref': '/',
-            'transaction_id': line["PAYMENT_DATE"] + line["TRANSACTION_ID"],
+            'transaction_id': line["TRANSACTION_ID"],
             'label': line["OPERATION_NAME"],
+            'atos_payment_sequence': line["OPERATION_SEQUENCE"],
+            'atos_payment_date': line["PAYMENT_DATE"],
         }
         return res
 
@@ -125,7 +128,7 @@ class AtosFileParser(FileParser):
         self.refund_amount = 0.0
         rows = []
         for row in self.result_row_list:
-            if row['OPERATION_NAME'] in ('CREDIT'):
+            if row['OPERATION_NAME'] in ('CREDIT', 'AUTHOR', 'CANCEL'):
                continue
             rows.append(row)
             if row['OPERATION_NAME'] == 'CREDIT_CAPTURE':
@@ -139,7 +142,8 @@ class AtosFileParser(FileParser):
                     " indeed the operation type %s is not supported"
                     )%row['OPERATION_NAME'])
         self.result_row_list = rows
-        self.statement_date = self.result_row_list[0]["OPERATION_DATE"]
+        if self.result_row_list:
+            self.statement_date = self.result_row_list[0]["OPERATION_DATE"]
         return res
 
     def get_refund_amount(self):

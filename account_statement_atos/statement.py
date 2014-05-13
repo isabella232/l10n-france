@@ -30,8 +30,9 @@ class AccountStatementProfil(orm.Model):
         Has to be inherited to add parser
         """
         res = super(AccountStatementProfil, self).get_import_type_selection(cr, uid, context=context)
-        res.extend([('atos_csvparser', 'Parser for Atos import statement'),
-                    ])
+        res.extend([
+            ('atos_csvparser', 'Parser for Atos import statement'),
+        ])
         return res
 
 
@@ -55,4 +56,14 @@ class AccountStatementProfil(orm.Model):
             }
 
             statement_line_obj.create(cursor, uid, transfer_vals, context=context)
+
+
+
+class AccountBankStatetementLine(orm.Model):
+    _inherit = 'account.bank.statement.line'
+
+    _columns = {
+        'atos_payment_sequence': fields.integer('Payment Sequence'),
+        'atos_payment_date': fields.date('Orignal Payment Date'),
+    }    
 

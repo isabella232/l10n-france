@@ -30,7 +30,7 @@ import logging
 
 
 SUBJECT_TO_PROCESS = [
-    u'liste des paiements trait\xe9s',
+#    u'liste des paiements trait\xe9s',
     u"liste des operations effectu\xe9es",
 ]
 
@@ -74,6 +74,15 @@ class file_document(orm.Model):
             res.append(vals)
         return res
 
+    def is_empty(self, cr, uid, filedocument, context=None):
+        if filedocument.file_type == 'bank_statement'\
+                and filedocument.profile_id.import_type == 'atos_csvparser':
+            lines = base64.b64decode(filedocument.datas).split('\r\n')
+            if len(lines) <= 2:
+                _logger.info('The file document with the id %s is empty, skip the import'%filedocument.id)
+                return True
+        return False
+
     def _run(self, cr, uid, filedocument, context=None):
         super(file_document, self)._run(cr, uid, filedocument, context=context) 
         if filedocument.file_type == 'atos_transaction':
@@ -95,3 +104,4 @@ class file_document(orm.Model):
                         },context=context)
             if error:
                 raise Exception(error)
+
