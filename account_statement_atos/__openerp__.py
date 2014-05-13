@@ -31,6 +31,7 @@
     'depends': [
         'account_statement_email',
         'account_statement_transactionid_completion',
+        'account_statement_base_import',
         'sale'
     ], 
     'init_xml': [],
