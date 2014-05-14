@@ -34,6 +34,13 @@ class CFONBFileParser(BankStatementImportParser):
     parser, but will also be useful as it allow to import a basic flat file.
     """
 
+    def __init__(self, parse_name, *args, **kwargs):
+        self._statement = None
+        super(CFONBFileParser, self).__init__(parse_name, *args, **kwargs)
+        self.support_multi_statements = True
+        
+
+
     @classmethod
     def parser_for(cls, parser_name):
         """
@@ -55,6 +62,16 @@ class CFONBFileParser(BankStatementImportParser):
         them, like concatenate stuff, and so... Work on self.filebuffer
         """
         self.filebuffer = self.filebuffer.replace('\r\n', '\n').replace('\r', '\n')
+        wb_file = tempfile.NamedTemporaryFile()
+        wb_file.write(self.filebuffer)
+        wb_file.seek(0)
+        reader = StatementReader()
+        res = reader.parse(wb_file)
+        self._statement = []
+        account_escape = []
+        for stat in res:
+            if stat.lines and stat.account_nb not in account_escape:
+                self._statement.append(stat)
         return True
 
     def _parse(self, *args, **kwargs):
@@ -62,29 +79,15 @@ class CFONBFileParser(BankStatementImportParser):
         Implement a method in your parser to save the result of parsing self.filebuffer
         in self.result_row_list instance property.
         """
-        context = kwargs['context']
-        if not context.get('statement_to_process'):
-            wb_file = tempfile.NamedTemporaryFile()
-            wb_file.write(self.filebuffer)
-            wb_file.seek(0)
-            reader = StatementReader()
-            res = reader.parse(wb_file)
-
-            #TODO make acccount_escape configurable from the view
-            statement_to_process = []
-            account_escape = context.get('account_escape', [])
-            for stat in res:
-                if stat.lines and stat.account_nb not in account_escape:
-                    statement_to_process.append(stat)
-            statement = statement_to_process.pop(0)
-            context['statement_to_process'] = statement_to_process
+        if self._statement:
+            statement = self._statement.pop(0)
+            self.result_row_list = statement.lines
+            self.balance_start = statement.header.prev_amount
+            self.balance_end = statement.footer.next_amount
+            return True
         else:
-            statement = context['statement_to_process'].pop(0)
+            return False
 
-        self.result_row_list = statement.lines
-        self.balance_start = statement.header.prev_amount
-        self.balance_end = statement.footer.next_amount
-        return True
 
     def _validate(self, *args, **kwargs):
         """

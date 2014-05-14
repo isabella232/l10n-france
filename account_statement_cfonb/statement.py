@@ -25,21 +25,14 @@ from openerp.osv import fields, orm
 class AccountStatementProfil(orm.Model):
     _inherit = "account.statement.profile"
 
-    def get_import_type_selection(self, cr, uid, context=None):
+    def _get_import_type_selection(self, cr, uid, context=None):
         """
         Has to be inherited to add parser
         """
-        res = super(AccountStatementProfil, self).get_import_type_selection(cr, uid, context=context)
+        res = super(AccountStatementProfil, self)._get_import_type_selection(cr, uid, context=context)
         res.extend([('cfonb_parser', 'Parser for CFONB import statement')])
         return res
 
-    def multi_statement_import(self, cr, uid, ids, profile_id, file_stream, ftype="csv", context=None):
-        result = super(AccountStatementProfil, self).multi_statement_import(cr, uid,\
-                ids, profile_id, file_stream, ftype=ftype, context=context)
-        while context.get('statement_to_process'):
-            result += super(AccountStatementProfil, self).multi_statement_import(cr, uid, ids,\
-                    profile_id, file_stream, ftype=ftype, context=context)
-        return result
 
 class account_bank_statement_line(orm.Model):
     _inherit = "account.bank.statement.line"
