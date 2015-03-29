@@ -31,6 +31,8 @@
     'website': 'http://www.akretion.com/',
     'depends': [
         'account_statement_email',
+        'account_statement_transactionid_completion',
+        'sale'
     ], 
     'init_xml': [],
     'update_xml': [ 

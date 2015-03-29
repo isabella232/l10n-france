@@ -34,7 +34,10 @@ def float_or_zero(val):
     return (float(val.replace(',', '.')) if val else 0.0)
 
 def format_date(val):
-    return datetime.datetime.strptime(val, "%d/%m/%Y")
+    if '/' in val:
+        return datetime.datetime.strptime(val, "%d/%m/%Y")
+    else:
+        return datetime.datetime.strptime(val, "%Y-%m-%d")
 
 class paybox_dialect(Dialect):
     """Describe the usual properties of Excel-generated CSV files."""
@@ -59,14 +62,13 @@ class PayboxFileParser(FileParser):
             "Type": unicode,
             "EmailCustomer": unicode,
             "RemittancePaybox": unicode,
-            "DateOfIssue": format_date,
+            "Date": format_date,
             "TransactionId": unicode,
             "Reference": unicode,
             "ShopName": unicode,
             "Amount": float_or_zero,
         }
         self.refund_amount = None
-        print conversion_dict, "kk"
         super(PayboxFileParser,self).__init__(parse_name, ftype=ftype,
                                            extra_fields=conversion_dict,
                                            dialect=paybox_dialect)
@@ -115,11 +117,10 @@ class PayboxFileParser(FileParser):
         self.statement_name = line['RemittancePaybox']
 
         res = {
-            'customer_email': line["EmailCustomer"],
-            'name': line["ShopName"],
-            'date': line["DateOfIssue"],
-            'amount': line['Amount'],
-            'ref': line['Reference'],
+            'name': line["TransactionId"],
+            'date': line["Date"],
+            'amount': line['Amount'] / 100,
+            'ref': '/',
             'transaction_id': line["TransactionId"],
             'label': line["Type"],
         }
@@ -134,9 +135,10 @@ class PayboxFileParser(FileParser):
         for row in self.result_row_list:
             if row['Type'] in ('ANU'):
                continue
+            amount = row["Amount"] / 100
             rows.append(row)
             if row['Type'] == 'CRE':
-                row["Amount"] = - row["Amount"]
+                row["Amount"] = - amount
             elif row['Type'] == 'DEB':
                 continue
             else:
@@ -145,7 +147,5 @@ class PayboxFileParser(FileParser):
                     " indeed the operation type %s is not supported"
                     )%row['Type'])            
         self.result_row_list = rows
-        self.statement_date = self.result_row_list[0]["DateOfIssue"]
+        self.statement_date = self.result_row_list[0]["Date"]
         return res
-
-

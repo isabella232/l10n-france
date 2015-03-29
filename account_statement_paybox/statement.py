@@ -22,15 +22,16 @@
 
 
 from openerp.osv import orm, fields
+from tools.translate import _
 
 class AccountStatementProfil(orm.Model):
     _inherit = "account.statement.profile"
 
-    def get_import_type_selection(self, cr, uid, context=None):
+    def _get_import_type_selection(self, cr, uid, context=None):
         """
         Has to be inherited to add parser
         """
-        res = super(AccountStatementProfil, self).get_import_type_selection(cr, uid, context=context)
+        res = super(AccountStatementProfil, self)._get_import_type_selection(cr, uid, context=context)
         res.extend([('paybox_csvparser', 'Parser for Paybox import statement'),
                     ])
         return res
