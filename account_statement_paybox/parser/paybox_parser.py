@@ -135,17 +135,16 @@ class PayboxFileParser(FileParser):
         for row in self.result_row_list:
             if row['Type'] in ('ANU'):
                continue
-            amount = row["Amount"] / 100
             rows.append(row)
             if row['Type'] == 'CRE':
-                row["Amount"] = - amount
+                row["Amount"] = - row["Amount"]
             elif row['Type'] == 'DEB':
                 continue
             else:
                 raise osv.except_osv(_("User Error"),
                     _("The bank statement imported have invalide line,"
                     " indeed the operation type %s is not supported"
-                    )%row['Type'])            
+                    )%row['Type'])
         self.result_row_list = rows
         self.statement_date = self.result_row_list[0]["Date"]
         return res
