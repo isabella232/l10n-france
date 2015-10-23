@@ -63,7 +63,7 @@ class PayboxFileParser(FileParser):
             "EmailCustomer": unicode,
             "RemittancePaybox": unicode,
             "Date": format_date,
-            "TransactionId": unicode,
+            "IdAppel": unicode,
             "Reference": unicode,
             "ShopName": unicode,
             "Amount": float_or_zero,
@@ -117,11 +117,11 @@ class PayboxFileParser(FileParser):
         self.statement_name = line['RemittancePaybox']
 
         res = {
-            'name': line["TransactionId"],
+            'name': line["Reference"],
             'date': line["Date"],
             'amount': line['Amount'] / 100,
             'ref': '/',
-            'transaction_id': line["TransactionId"],
+            'transaction_id': line["IdAppel"],
             'label': line["Type"],
         }
         return res
