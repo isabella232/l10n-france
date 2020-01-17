@@ -57,7 +57,13 @@ class AccountBankStatementImport(models.TransientModel):
             return super(AccountBankStatementImport, self)._parse_file(
                 data_file)
         transactions = []
-        if not data_file.splitlines():
+        # The CFONB spec says you should only have digits, capital letters
+        # and * - . /
+        # But many banks don't respect that and use regular letters for exemple
+        # And I found one (LCL) that even uses caracters with accents
+        # So the best method is probably to decode with latin1
+        data_file_decoded = data_file.decode('latin1')
+        if not self.split_lines(data_file_decoded):
             raise UserError(_('The file is empty.'))
         i = 0
         seq = 1
@@ -65,13 +71,7 @@ class AccountBankStatementImport(models.TransientModel):
         decimals = start_balance = False
         start_balance = end_balance = False
         vals_line = False
-        # The CFONB spec says you should only have digits, capital letters
-        # and * - . /
-        # But many banks don't respect that and use regular letters for exemple
-        # And I found one (LCL) that even uses caracters with accents
-        # So the best method is probably to decode with latin1
-        data_file_decoded = data_file.decode('latin1')
-        for line in data_file_decoded.splitlines():
+        for line in self.split_lines(data_file_decoded):
             i += 1
             _logger.debug("Line %d: %s" % (i, line))
             if not line:
@@ -158,5 +158,17 @@ class AccountBankStatementImport(models.TransientModel):
             'balance_start': start_balance,
             'balance_end_real': end_balance,
             'transactions': transactions,
-            }
+        }
         return currency_code, account_number, [vals_bank_statement]
+
+    def split_lines(self, data_file):
+        data_file_without_linebreaks = data_file.replace(
+            '\n', ''
+        ).replace('\r', '')
+        max_len = len(data_file_without_linebreaks)
+        lines = []
+        if max_len % 120:
+            raise UserError(_("The file is not divisible in 120 char lines"))
+        for index in range(0, max_len, 120):
+            lines.append(data_file_without_linebreaks[index:index + 120])
+        return lines
