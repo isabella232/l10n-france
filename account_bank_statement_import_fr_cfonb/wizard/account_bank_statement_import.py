@@ -162,13 +162,28 @@ class AccountBankStatementImport(models.TransientModel):
         return currency_code, account_number, [vals_bank_statement]
 
     def split_lines(self, data_file):
+        """Split the data file into lines.
+
+        Returns a list of the lines in the file provided.
+        """
+        # According to the standard each line has to be 120 chars long, but
+        # some banks ship the files without line break.
+        # so we want to split the file after 120 chars, no matter if there
+        # is a newline there or not.
+
+        # remove linebreaks
         data_file_without_linebreaks = data_file.replace(
             '\n', ''
         ).replace('\r', '')
+
+        # check length of file
         max_len = len(data_file_without_linebreaks)
         lines = []
+
+        # make sure the length is a multiple of 120 otherwise it isn't valid
         if max_len % 120:
             raise UserError(_("The file is not divisible in 120 char lines"))
         for index in range(0, max_len, 120):
+            # append a 120 char slice of the file to the list of lines
             lines.append(data_file_without_linebreaks[index:index + 120])
         return lines
