@@ -7,8 +7,8 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 class TestsaleEcotaxe(AccountTestInvoicingCommon):
     @classmethod
-    def setUpClass(cls):
-        super(TestsaleEcotaxe, cls).setUpClass()
+    def setUpClass(cls, chart_template_ref="l10n_fr.l10n_fr_pcg_chart_template"):
+        super(TestsaleEcotaxe, cls).setUpClass(chart_template_ref)
 
         cls.ecotaxe_classification = cls.env["account.ecotaxe.classification"]
         cls.ecotaxe_classification1 = cls.ecotaxe_classification.create(
