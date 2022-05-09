@@ -10,7 +10,7 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     subtotal_ecotaxe = fields.Float(
-        store=True, compute="_compute_ecotaxe", oldname="amount_ecotaxe"
+        store=True, compute="_compute_ecotaxe"
     )
     unit_ecotaxe_amount = fields.Float(
         string="ecotaxe Unit.",
